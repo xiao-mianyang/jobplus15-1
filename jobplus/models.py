@@ -1,13 +1,13 @@
 from datetime import datetime 
-from flask_sqlalchemy import SQLALchemy
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-db = SQLALchemy()
+db = SQLAlchemy()
 
 
-class Base(db.Models):
+class Base(db.Model):
 
     __abstract__ = True
 
@@ -30,12 +30,12 @@ class User(Base, UserMixin):
     ROLE_COMPANY = 20
     ROLE_ADMIN = 30
 
-    id = db.Column(db.Integer, primary=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True, index=True, nullable=False)
     email = db.Column(db.String(64), unique=True, index=True, nullable=False)
     _password = db.Column('password', db.String(256), nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER)
-    resume = de.relationship('Resume', uselist=False)
+    resume = db.relationship('Resume', uselist=False)
     collect_jobs = db.relationship('job', secondary=user_job)
     upload_resume_url = db.Column(db.String(64))
 
@@ -55,17 +55,17 @@ class User(Base, UserMixin):
 
     @property
     def is_admin(self):
-        return self.role = self.ROLE_ADMIN
+        return self.role == self.ROLE_ADMIN
     @property
     def is_company(self):
-        return self.role = self.ROLE_COMPANY
+        return self.role == self.ROLE_COMPANY
 
 class Resume(Base):
     __tablename__ = 'resume'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeginKey('user.id'))
-    user = db.relationship('User', uselist=Flase)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', uselist=False)
     job_experiences = db.relationship('JobExperience')
     edu_experiences = db.relationship('EduExperience')
     project_experiences = db.relationship('ProjectExperience')
@@ -103,9 +103,9 @@ class ProjectExperice(Experience):
 
 
 class Company(Base):
-    __table__ = 'company'
+    __tablename__ = 'company'
 
-    id = db.Column(db.Integer, primary_key=Ture)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64),nullable=False,index=True,unique=True)
     slug = db.Column(db.String(24),nullable=False,index=True,unique=True)
     logo= db.Column(db.String(64),nullable=False)
@@ -119,7 +119,7 @@ class Company(Base):
     stack = db.Column(db.String(128))
     team_introduction = db.Column(db.String(256))
     welfares = db.Column(db.String(256))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), ondelete='SET NULL')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))
     user = db.relationship('User', uselist=False, backref=db.backref('company', uselist=False))
 
     def __repr__(self):
@@ -141,13 +141,13 @@ class Job(Base):
     is_open = db.Column(db.Boolean, default=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'))
     company = db.relationship('Company', uselist=False)
-    views_count = db.column(db.Integer, default=0)
+    views_count = db.Column(db.Integer, default=0)
     
     def __repr__(self):
         return '<Job {}>'.format(self.name)
 
 
-class Dilivery(Base):
+class Delivery(Base):
     __tablename__ = 'delivery'
 
 

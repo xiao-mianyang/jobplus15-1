@@ -1,15 +1,13 @@
-
 class BaseConfig(object):
-
-    SQLALCHEMY_TRACK_MODIFIVATIONS = Flase
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = ''
     INDEX_PER_PAGE = 9
     AMIN_PER_PAGE = 15
 
-class DevelopmentConfig(BaseConfig):
 
+class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost:3306/jobplus?charset=utf-8'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root@localhost:3306/jobplus?charset=utf8'
 
 
 class ProductConfig(BaseConfig):
